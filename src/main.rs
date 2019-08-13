@@ -2,7 +2,6 @@ extern crate clap;
 extern crate image;
 extern crate rand;
 extern crate rand_xorshift;
-extern crate sha2;
 use clap::{App, Arg};
 use image::{GenericImage, GenericImageView, ImageBuffer, RgbImage};
 use rand::prelude::*;
@@ -28,7 +27,14 @@ fn main() {
                 .long("size")
                 .takes_value(true)
                 .help("Size of image, s x s.")
-                .default_value("256"),
+                .default_value("50"),
+        )
+        .arg(
+            Arg::with_name("scale")
+                .long("scale")
+                .takes_value(true)
+                .help("Scale of image")
+                .default_value("10"),
         )
         .arg(
             Arg::with_name("monochrome")
@@ -55,24 +61,23 @@ fn main() {
     let mut rng = XorShiftRng::seed_from_u64(hasher.finish());
 
     let size = matches.value_of("size").unwrap().parse::<u32>().unwrap();
+    let scale = matches.value_of("scale").unwrap().parse::<u32>().unwrap();
 
-    let mut imgbuf: RgbImage = ImageBuffer::new(size, size);
+    let mut imgbuf: RgbImage = ImageBuffer::new(size * scale, size * scale);
 
     let primary = [rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()];
     let secondary = [rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()];
+    let background = [rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()];
 
-    for (x, y, pixel) in imgbuf.enumerate_pixels_mut() {
-        if x > size / 2 {
-            let r = primary[0];
-            let g = primary[1];
-            let b = primary[2];
-            *pixel = image::Rgb([r as u8, g as u8, b as u8]);
-        } else {
-            let r = secondary[0];
-            let g = secondary[1];
-            let b = secondary[2];
-            *pixel = image::Rgb([r as u8, g as u8, b as u8]);
-        }
+    let width = rng.gen_range(10, (size * scale) / 2);
+
+    let run = rng.gen_ratio(1, 2);
+    for (x, pixel) in imgbuf.enumerate_rows_mut() {
+        // if run {
+        //     pixel = image::Rgb(primary);
+        // } else {
+        //     pixel = image::Rgb(secondary);
+        // }
     }
 
     imgbuf
