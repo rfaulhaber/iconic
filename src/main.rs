@@ -96,26 +96,58 @@ fn main() {
     let secondary = [rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()];
     let background = [rng.gen::<u8>(), rng.gen::<u8>(), rng.gen::<u8>()];
 
-    for _ in 0..rng.gen_range(5, size / 3) {
-        let (x, y) = (
-            rng.gen_range(-(size as i32), size as i32),
-            rng.gen_range(-(size as i32), size as i32),
-        );
-        let (width, height) = (rng.gen_range(10, size / 2), rng.gen_range(10, size / 2));
-        let rect = Rect::at(x, y).of_size(width, height);
+    if matches.is_present("symmetric") {
+        for _ in 0..rng.gen_range(5, size / 3) {
+            let (x, y) = (
+                rng.gen_range(-(size as i32) / 2, size as i32 / 2),
+                rng.gen_range(-(size as i32) / 2, size as i32 / 2),
+            );
+            let (width, height) = (rng.gen_range(10, size / 2), rng.gen_range(10, size / 2));
+            let rect = Rect::at(x, y).of_size(width, height);
 
-        let flip = rng.gen_ratio(1, 3);
+            let flip = rng.gen_ratio(1, 3);
 
-        if flip {
-            draw_filled_rect_mut(&mut img, rect, image::Rgb(primary));
-        } else {
-            draw_filled_rect_mut(&mut img, rect, image::Rgb(secondary));
+            if flip {
+                draw_filled_rect_mut(&mut img, rect, image::Rgb(primary));
+            } else {
+                draw_filled_rect_mut(&mut img, rect, image::Rgb(secondary));
+            }
         }
-    }
 
-    for (_, _, pixel) in img.enumerate_pixels_mut() {
-        if pixel.to_rgb() == image::Rgb([0, 0, 0]) {
-            *pixel = image::Rgb(background);
+        for (x, y, pixel) in img.enumerate_pixels_mut() {
+            if pixel.to_rgb() == image::Rgb([0, 0, 0]) {
+                *pixel = image::Rgb(background);
+            }
+        }
+
+        let img_copy = img.clone();
+        for (x, y, pixel) in img.enumerate_pixels_mut() {
+            if x > size / 2 {
+                *pixel = *img_copy.get_pixel(x - (size / 2), y);
+            }
+        }
+    } else {
+        for _ in 0..rng.gen_range(5, size / 3) {
+            let (x, y) = (
+                rng.gen_range(-(size as i32), size as i32),
+                rng.gen_range(-(size as i32), size as i32),
+            );
+            let (width, height) = (rng.gen_range(10, size / 2), rng.gen_range(10, size / 2));
+            let rect = Rect::at(x, y).of_size(width, height);
+
+            let flip = rng.gen_ratio(1, 3);
+
+            if flip {
+                draw_filled_rect_mut(&mut img, rect, image::Rgb(primary));
+            } else {
+                draw_filled_rect_mut(&mut img, rect, image::Rgb(secondary));
+            }
+        }
+
+        for (_, _, pixel) in img.enumerate_pixels_mut() {
+            if pixel.to_rgb() == image::Rgb([0, 0, 0]) {
+                *pixel = image::Rgb(background);
+            }
         }
     }
 
