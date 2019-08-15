@@ -121,9 +121,13 @@ fn main() {
         }
 
         let img_copy = img.clone();
-        for (x, y, pixel) in img.enumerate_pixels_mut() {
-            if x > size / 2 {
-                *pixel = *img_copy.get_pixel(x - (size / 2), y);
+        let half = size / 2;
+
+        // TODO this isn't right!
+
+        for x in half..img.width() {
+            for y in 0..img.height() {
+                *img.get_pixel_mut(x, y) = *img_copy.get_pixel(x, y);
             }
         }
     } else {
