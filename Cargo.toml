@@ -8,6 +8,8 @@ edition = "2018"
 
 [dependencies]
 clap = "2.33.0"
-image = "0.22.1"
+# imageproc depends on ^0.21.0
+image = "0.21.1"
+imageproc = "0.18.0"
 rand = "0.7.0"
 rand_xorshift = "0.2.0"
